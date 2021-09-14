@@ -44,6 +44,27 @@ def print_time(func):
     return wrapper
 
 
+def cache(func):
+    """
+    decorator which caches function result
+    assuming that all items in args and kwargs are immutable types and can be converted to string (has __str__)
+    >>> @cache
+    >>> def some_func(*args, **kwargs): pass
+    """
+    storage = {}
+
+    def wrapper(*args, **kwargs):
+        key = str(*args, **kwargs)
+        if storage.get(key):
+            return storage[key]
+        else:
+            result = func(*args, **kwargs)
+            storage[key] = result
+            return result
+
+    return wrapper
+
+
 @print_time
 def csv_to_json(csv_file_path: str, json_file_path: str):
     """
@@ -76,6 +97,7 @@ def csv_to_json(csv_file_path: str, json_file_path: str):
 
 
 @print_time
+@cache
 def factorial(n: int):
     """
     factorial(n) = 1 * 2 * 3 * ... * (n - 1) * n
@@ -93,16 +115,6 @@ def factorial(n: int):
         return 1
     else:
         return n * factorial(n - 1)
-
-
-def cache(func):
-    """
-    decorator which caches function result
-    assuming that all items in args and kwargs are immutable types and can be converted to string (has __str__)
-    >>> @cache
-    >>> def some_func(*args, **kwargs): pass
-    """
-    raise NotImplementedError
 
 
 def sized_cache(size=10):
