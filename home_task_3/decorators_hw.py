@@ -65,6 +65,30 @@ def cache(func):
     return wrapper
 
 
+def sized_cache(func, size=10):
+    """
+    parametrized decorator(fabric of decorators) which caches function result
+        but saves not more than size items in cache
+    assuming that all items in args and kwargs are immutable types and can be converted to string (has __str__ method)
+    >>> @sized_cache(size=5)
+    >>> def some_func(*args, **kwargs): pass
+    """
+    storage = {}
+    keys_queue = []
+
+    def wrapper(*args, **kwargs):
+        key = str(*args, **kwargs)
+        if not storage.get(key):
+            result = func(*args, **kwargs)
+            storage[key] = result
+            keys_queue.append(key)
+            if len(keys_queue) > size:
+                del(storage[keys_queue.pop(0)])
+        return storage[key]
+
+    return wrapper
+
+
 @print_time
 def csv_to_json(csv_file_path: str, json_file_path: str):
     """
@@ -115,14 +139,3 @@ def factorial(n: int):
         return 1
     else:
         return n * factorial(n - 1)
-
-
-def sized_cache(size=10):
-    """
-    parametrized decorator(fabric of decorators) which caches function result
-        but saves not more than size items in cache
-    assuming that all items in args and kwargs are immutable types and can be converted to string (has __str__ method)
-    >>> @sized_cache(size=5)
-    >>> def some_func(*args, **kwargs): pass
-    """
-    raise NotImplementedError
