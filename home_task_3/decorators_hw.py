@@ -56,9 +56,19 @@ def csv_to_json(csv_file_path: str, json_file_path: str):
 def factorial(n: int):
     """
     factorial(n) = 1 * 2 * 3 * ... * (n - 1) * n
-    5! = 1 * 2 * 3 * 4 * 5 = 120.
+    5! = 1 * 2 * 3 * 4 * 5 = 120
+
+    >>> import math
+    >>> factorial(5) == math.factorial(5)
+    True
+    >>> factorial(20) == math.factorial(20)
+    True
+
     """
-    raise NotImplementedError
+    if n == 1:
+        return 1
+    else:
+        return n * factorial(n - 1)
 
 
 def print_time(func):
