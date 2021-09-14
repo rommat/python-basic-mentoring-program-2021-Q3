@@ -18,14 +18,39 @@ analyze results
 """
 
 
+import csv
+import json
+from pathlib import Path
+
+
 def csv_to_json(csv_file_path: str, json_file_path: str):
     """
     read csv file and generate json
     csv format: (last_name,first_name,second_name) - example.csv
     json format: check example.json
-    """
 
-    raise NotImplementedError
+    >>> csv_to_json('example.csv', 'example_converted.json')
+    File 'example_converted.json' was generated successfully
+    >>> csv_to_json('exampled.csv', 'example_converted.json')
+    File 'exampled.csv' is not found
+
+    """
+    fieldnames = ('last_name', 'first_name', 'second_name')
+
+    try:
+        # read csv file
+        with open(Path(csv_file_path)) as csv_file:
+            csv_reader = csv.DictReader(csv_file, fieldnames)
+            csv_data = {num: row for num, row in enumerate(csv_reader, start=1)}
+
+        # generate json
+        with open(Path(json_file_path), 'w') as json_file:
+            json.dump(csv_data, json_file, indent=2)
+
+        print(f"File '{json_file_path}' was generated successfully")
+
+    except FileNotFoundError:
+        print(f"File '{csv_file_path}' is not found")
 
 
 def factorial(n: int):
