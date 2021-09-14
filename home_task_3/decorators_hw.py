@@ -21,8 +21,30 @@ analyze results
 import csv
 import json
 from pathlib import Path
+import time
 
 
+def print_time(func):
+    """
+    decorator which print time of function call duration
+    >>> @print_time
+    >>> def some_func(*args, **kwargs): return "result"
+    exampe:
+    >>> some_func()
+    >>> "start_time: {time here}, end_time: {time here}, duration: {time here}"
+    >>> "result"
+    """
+    def wrapper(*args, **kwargs):
+        start = time.time()
+        result = func(*args, **kwargs)
+        done = time.time()
+        print(f"start_time: {start}, end_time: {done}, duration: {done - start}")
+        return result
+
+    return wrapper
+
+
+@print_time
 def csv_to_json(csv_file_path: str, json_file_path: str):
     """
     read csv file and generate json
@@ -53,35 +75,24 @@ def csv_to_json(csv_file_path: str, json_file_path: str):
         print(f"File '{csv_file_path}' is not found")
 
 
+@print_time
 def factorial(n: int):
     """
     factorial(n) = 1 * 2 * 3 * ... * (n - 1) * n
     5! = 1 * 2 * 3 * 4 * 5 = 120
 
-    >>> import math
-    >>> factorial(5) == math.factorial(5)
-    True
-    >>> factorial(20) == math.factorial(20)
-    True
+    >>> factorial(0)
+    1
+    >>> factorial(1)
+    1
+    >>> factorial(5)
+    120
 
     """
-    if n == 1:
+    if n == 0:
         return 1
     else:
         return n * factorial(n - 1)
-
-
-def print_time(func):
-    """
-    decorator which print time of function call duration
-    >>> @print_time
-    >>> def some_func(*args, **kwargs): return "result"
-    exampe:
-    >>> some_func()
-    >>> "start_time: {time here}, end_time: {time here}, duration: {time here}"
-    >>> "result"
-    """
-    pass
 
 
 def cache(func):
