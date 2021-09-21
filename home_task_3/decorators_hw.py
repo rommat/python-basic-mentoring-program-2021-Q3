@@ -65,7 +65,7 @@ def cache(func):
     return wrapper
 
 
-def sized_cache(func, size=10):
+def sized_cache(size=10):
     """
     parametrized decorator(fabric of decorators) which caches function result
         but saves not more than size items in cache
@@ -73,20 +73,24 @@ def sized_cache(func, size=10):
     >>> @sized_cache(size=5)
     >>> def some_func(*args, **kwargs): pass
     """
-    storage = {}
-    keys_queue = []
+    def out_wrapper(func):
 
-    def wrapper(*args, **kwargs):
-        key = str(*args, **kwargs)
-        if not storage.get(key):
-            result = func(*args, **kwargs)
-            storage[key] = result
-            keys_queue.append(key)
-            if len(keys_queue) > size:
-                del(storage[keys_queue.pop(0)])
-        return storage[key]
+        storage = {}
+        keys_queue = []
 
-    return wrapper
+        def wrapper(*args, **kwargs):
+            key = str(*args, **kwargs)
+            if not storage.get(key):
+                result = func(*args, **kwargs)
+                storage[key] = result
+                keys_queue.append(key)
+                if len(keys_queue) > size:
+                    del(storage[keys_queue.pop(0)])
+            return storage[key]
+
+        return wrapper
+
+    return out_wrapper
 
 
 @print_time
@@ -97,27 +101,24 @@ def csv_to_json(csv_file_path: str, json_file_path: str):
     json format: check example.json
 
     >>> csv_to_json('example.csv', 'example_converted.json')
-    File 'example_converted.json' was generated successfully
-    >>> csv_to_json('exampled.csv', 'example_converted.json')
-    File 'exampled.csv' is not found
 
     """
     fieldnames = ('last_name', 'first_name', 'second_name')
 
+    # read csv file
     try:
-        # read csv file
         with open(Path(csv_file_path)) as csv_file:
             csv_reader = csv.DictReader(csv_file, fieldnames)
             csv_data = {num: row for num, row in enumerate(csv_reader, start=1)}
+    except FileNotFoundError as err:
+        raise CustomException() from err
 
-        # generate json
+    # generate json
+    try:
         with open(Path(json_file_path), 'w') as json_file:
             json.dump(csv_data, json_file, indent=2)
-
-        print(f"File '{json_file_path}' was generated successfully")
-
-    except FileNotFoundError:
-        print(f"File '{csv_file_path}' is not found")
+    except OSError as err:
+        raise CustomException() from err
 
 
 @print_time
