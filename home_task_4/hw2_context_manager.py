@@ -35,7 +35,8 @@ class Timer:
         print(f"Block '{self.block_name}' executed in {duration} sec")
 
 
-with Timer('doing some sleeps'):
-    sleep(1)
-    sleep(2)
-    sleep(3)
+if __name__ == '__main__':
+    with Timer('doing some sleeps'):
+        sleep(1)
+        sleep(2)
+        sleep(3)
